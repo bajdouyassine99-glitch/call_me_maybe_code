@@ -1,0 +1,31 @@
+[project]
+name = "call-me-maybe"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+                "llm-sdk",
+                "mypy>=2.1.0",
+                "pydantic>=2.13.4",
+                "tomli>=2.4.1",
+]
+
+
+[tool.uv.workspace]
+members = [
+            "llm_sdk",
+          ]
+
+
+
+[tool.mypy]
+disable_error_code = ["attr-defined"]
+exclude = [
+            'llm_sdk.'
+          ]
+
+
+
+[tool.uv.sources]
+llm-sdk = { workspace = true }
