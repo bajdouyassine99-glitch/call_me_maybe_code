@@ -1,3 +1,5 @@
+run:
+	@python3 -m src
 clean:
 	rm -rf .mypy_cache
 	rm -rf src/__pycache__
