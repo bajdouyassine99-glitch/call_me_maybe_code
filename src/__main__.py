@@ -1,34 +1,42 @@
+from .m1_args_parser import parse_args
+from .m2_json_parser import get_json_content, ParsePrompt, ParseFuncDef
+from .m3_sys_prompt import sys_prompt
 from pydantic import ValidationError
-from .m1_parsing import parse_args, get_json_content, ParsePrompt
-from .m1_parsing import Parse_Func_Def
-import sys
 from llm_sdk import Small_LLM_Model
-from .m2_sys_prompt import sys_prompt, lst_of_funcs
-from .m3_const_decod import Llm_Get_Right_Function
+from .m4_cons_decoding import right_func_name
 
 
 def main():
 
-    # get 3 paths sous forme de NameSpace object :
-    # (functions_definition, input, output)
+    # get 4 paths sous forme de Dict object :
+    # (functions_definition, input, output, model)
     args = parse_args()
 
-    prompts = get_json_content(args.input)
-    func_defs = get_json_content(args.functions_definition)
+    prompts = get_json_content(args["input"])
+    prompts_parse = [ParsePrompt(**i) for i in prompts]
 
-    prompts = [ParsePrompt(**i) for i in prompts]
+    funcs_def = get_json_content(args["functions_definition"])
+    funcs_def_parse = [ParseFuncDef(**i) for i in funcs_def]
 
-    func_defs = [Parse_Func_Def(**i) for i in func_defs]
+    ai_prompt = sys_prompt(funcs_def, prompts[2]['prompt'])
 
-    llm = Small_LLM_Model(args.model)
+    llm = Small_LLM_Model()
+
+    vocab = get_json_content(llm.get_path_to_vocab_file())
+
+    res = right_func_name(llm, funcs_def, ai_prompt, vocab)
+
+    print(res)
 
 
-    lst_functs = lst_of_funcs(func_defs)
 
-    for pr in prompts:
-        ai_prompt = sys_prompt(func_defs, pr.prompt)
-        right_function = Llm_Get_Right_Function(llm, lst_functs, ai_prompt)
-        print(right_function.print())
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -40,20 +48,16 @@ if __name__ == "__main__":
     except ModuleNotFoundError as e:
         # If we dont have the module
         print("Error", e)
-        sys.exit(1)
 
     except ImportError as e:
         # The module exist but the import faild (no method, class, circ import)
         print("Error", e)
-        sys.exit(1)
 
     except ValidationError as e:
         # for pydantic
         print("❌ Data Validation Error!")
         print(e)
-        sys.exit(1)
 
-    except Exception as e:
-        # any other exceptions (very important. dont miss Exception)
-        print(e)
-        sys.exit(1)
+    # except Exception as e:
+    #     # any other exceptions (very important. dont miss Exception)
+    #     print(e)
