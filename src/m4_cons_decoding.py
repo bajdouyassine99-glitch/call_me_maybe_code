@@ -3,12 +3,11 @@ from typing import List, Any, Dict, Set
 import numpy as np
 
 
-def right_func_name(
-                        llm: Small_LLM_Model,
-                        funcs_def: List[Dict[str, Any]],
-                        one_prompt: str,
-                        vocab: Dict[str, int]
-                   ):
+def func_name_const_decod(
+                            llm: Small_LLM_Model,
+                            funcs_def: List[Dict[str, Any]],
+                            one_prompt: str,
+                         ):
 
     lst_funcs_def = [i["name"] for i in funcs_def]
 
@@ -49,3 +48,19 @@ def right_func_name(
             break
 
     return res_str
+
+
+def full_constr_decod(
+                        llm: Small_LLM_Model,
+                        funcs_def: List[Dict[str, Any]],
+                        ai_function: str,
+                        one_prompt: str,
+                        ai_prompt: str
+                     ):
+
+    json_start = (
+                    f'{ai_prompt}' + '{\n  "prompt": "' + f'{one_prompt}' +
+                    '",\n' + '  "parameters": {"'
+                 )
+
+    print(json_start)
